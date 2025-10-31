@@ -32,7 +32,7 @@
     position: relative;
     transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
     background: conic-gradient(
-      #d00 0deg 9.73deg,
+      #0b0 0deg 9.73deg,
       #000 9.73deg 19.46deg,
       #d00 19.46deg 29.19deg,
       #000 29.19deg 38.92deg,
@@ -68,22 +68,30 @@
       #000 321.09deg 330.82deg,
       #d00 330.82deg 340.55deg,
       #000 340.55deg 350.28deg,
-      #d00 350.28deg 360deg
+      #0b0 350.28deg 360deg
     );
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .numbers {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 100%;
+    height: 100%;
     transform: translate(-50%, -50%);
   }
 
   .number {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center calc(-50% + 6px);
+    font-size: calc(8px + 0.8vw);
     color: white;
-    font-size: calc(8px + 0.6vw);
-    transform-origin: center -45%;
+    text-shadow: 0 0 2px black;
   }
 
   .spin-button {
@@ -127,7 +135,7 @@ const wheel = document.getElementById('wheel');
 const spinBtn = document.getElementById('spin');
 const numbersContainer = document.getElementById('numbers');
 
-// European roulette numbers
+// European roulette layout
 const numbers = [
   0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6,
   27, 13, 36, 11, 30, 8, 23, 10, 5, 24,
@@ -138,23 +146,23 @@ const numbers = [
 const totalNumbers = numbers.length;
 const sliceAngle = 360 / totalNumbers;
 
-// Draw numbers around wheel
+// Place numbers evenly around the wheel
 numbers.forEach((num, i) => {
   const el = document.createElement('div');
   el.className = 'number';
-  el.style.transform = `rotate(${i * sliceAngle}deg) translateY(-50%)`;
   el.innerText = num;
+  const angle = i * sliceAngle;
+  el.style.transform = `rotate(${angle}deg) translateY(-45%) rotate(-${angle}deg)`;
   numbersContainer.appendChild(el);
 });
 
 let currentRotation = 0;
 spinBtn.addEventListener('click', () => {
   spinBtn.disabled = true;
-
   const randomNumber = Math.floor(Math.random() * totalNumbers);
   const extraRotations = 5; // spin at least 5 times
   const targetRotation = 360 * extraRotations + (360 - randomNumber * sliceAngle);
-  
+
   currentRotation += targetRotation;
   wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
   wheel.style.transform = `rotate(${currentRotation}deg)`;
