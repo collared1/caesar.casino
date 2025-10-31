@@ -1,195 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roulette Wheel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Picker</title>
 <style>
   body {
-    background-color: #001f3f;
-    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
+    justify-content: flex-start;
+    min-height: 100vh;
     margin: 0;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
+    padding-top: 50px;
+    background: #081a34; /* slightly darker dark blue */
+    color: #fff;
   }
 
-  .roulette-container {
-    position: relative;
-    width: min(80vw, 400px);
-    height: min(80vw, 400px);
+  .picker-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  .wheel {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid #fff;
-    position: relative;
-    transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
-    background: conic-gradient(
-      #0b0 0deg 9.73deg,
-      #000 9.73deg 19.46deg,
-      #d00 19.46deg 29.19deg,
-      #000 29.19deg 38.92deg,
-      #d00 38.92deg 48.65deg,
-      #000 48.65deg 58.38deg,
-      #d00 58.38deg 68.11deg,
-      #000 68.11deg 77.84deg,
-      #d00 77.84deg 87.57deg,
-      #000 87.57deg 97.3deg,
-      #d00 97.3deg 107.03deg,
-      #000 107.03deg 116.76deg,
-      #d00 116.76deg 126.49deg,
-      #000 126.49deg 136.22deg,
-      #d00 136.22deg 145.95deg,
-      #000 145.95deg 155.68deg,
-      #d00 155.68deg 165.41deg,
-      #000 165.41deg 175.14deg,
-      #d00 175.14deg 184.87deg,
-      #000 184.87deg 194.6deg,
-      #d00 194.6deg 204.33deg,
-      #000 204.33deg 214.06deg,
-      #d00 214.06deg 223.79deg,
-      #000 223.79deg 233.52deg,
-      #d00 233.52deg 243.25deg,
-      #000 243.25deg 252.98deg,
-      #d00 252.98deg 262.71deg,
-      #000 262.71deg 272.44deg,
-      #d00 272.44deg 282.17deg,
-      #000 282.17deg 291.9deg,
-      #d00 291.9deg 301.63deg,
-      #000 301.63deg 311.36deg,
-      #d00 311.36deg 321.09deg,
-      #000 321.09deg 330.82deg,
-      #d00 330.82deg 340.55deg,
-      #000 340.55deg 350.28deg,
-      #0b0 350.28deg 360deg
-    );
+  input {
+    width: 60px;
+    padding: 5px 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: 1px solid #555;
+    text-align: center;
+    background-color: #1c2f5a;
+    color: #fff;
   }
 
-  .numbers {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-
-  .number {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-origin: center calc(-50% - 42%);
-    font-size: calc(10px + 0.8vw);
-    color: white;
-    text-shadow: 0 0 2px black;
-  }
-
-  .pointer {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 20px solid yellow;
-    z-index: 10;
-  }
-
-  .spin-button {
-    position: absolute;
-    bottom: -70px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #0055ff;
+  button {
+    padding: 6px 15px;
+    font-size: 1em;
     border: none;
-    border-radius: 10px;
-    padding: 12px 30px;
-    font-size: 1rem;
+    border-radius: 5px;
+    background-color: #4aa3df;
     color: white;
     cursor: pointer;
     transition: background-color 0.2s;
   }
 
-  .spin-button:hover {
-    background-color: #0077ff;
+  button:hover {
+    background-color: #2980b9;
   }
 
-  @media (max-width: 500px) {
-    .spin-button {
-      bottom: -60px;
-      font-size: 0.9rem;
-      padding: 10px 24px;
-    }
+  .balls {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .ball {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #6fb3e0, #2a7bbd);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    transform: scale(1);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+
+  .glow {
+    box-shadow: 0 0 10px #6fb3e0, 0 0 20px #2a7bbd;
   }
 </style>
 </head>
 <body>
-  <div class="roulette-container">
-    <div class="pointer"></div>
-    <div class="wheel" id="wheel">
-      <div class="numbers" id="numbers"></div>
-    </div>
-    <button class="spin-button" id="spin">SPIN</button>
-  </div>
+
+<div class="picker-container">
+  <label>Pick numbers (1–10):</label>
+  <input type="number" id="count" min="1" max="10" value="5">
+  <button onclick="pickNumbers()">Pick</button>
+</div>
+
+<div class="balls" id="ballsContainer"></div>
 
 <script>
-const wheel = document.getElementById('wheel');
-const spinBtn = document.getElementById('spin');
-const numbersContainer = document.getElementById('numbers');
+function pickNumbers() {
+  const count = Math.min(Math.max(parseInt(document.getElementById('count').value), 1), 10);
+  const container = document.getElementById('ballsContainer');
+  container.innerHTML = '';
 
-// Single-zero European roulette numbers (37 slots)
-const numbers = [
-  0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6,
-  27, 13, 36, 11, 30, 8, 23, 10, 5, 24,
-  16, 33, 1, 20, 14, 31, 9, 22, 18, 29,
-  7, 28, 12, 35, 3, 26
-];
+  for (let i = 0; i < count; i++) {
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    container.appendChild(ball);
+    animateBall(ball);
+  }
+}
 
-const totalNumbers = numbers.length;
-const sliceAngle = 360 / totalNumbers;
+function animateBall(ball) {
+  let cycles = 20;
+  let interval = 50;
+  let cycleCount = 0;
 
-// Place numbers evenly around edge
-numbers.forEach((num, i) => {
-  const el = document.createElement('div');
-  el.className = 'number';
-  el.innerText = num;
-  const angle = i * sliceAngle;
-  el.style.transform = `rotate(${angle}deg) translateY(-48%) rotate(-${angle}deg)`;
-  numbersContainer.appendChild(el);
-});
+  const animation = setInterval(() => {
+    ball.textContent = Math.floor(Math.random() * 10);
+    ball.style.transform = `scale(${1 + Math.random()*0.4})`;
 
-let currentRotation = 0;
+    // Subtle glow while cycling
+    ball.classList.add('glow');
 
-spinBtn.addEventListener('click', () => {
-  spinBtn.disabled = true;
-
-  const randomIndex = Math.floor(Math.random() * totalNumbers);
-  const extraRotations = 5;
-  const offsetToTop = sliceAngle / 2; // ensures number aligns with pointer at top
-  const targetAngle = (360 - randomIndex * sliceAngle - offsetToTop) % 360;
-
-  const totalRotation = 360 * extraRotations + targetAngle;
-  currentRotation += totalRotation;
-
-  wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
-  wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-  setTimeout(() => {
-    spinBtn.disabled = false;
-    const result = numbers[randomIndex];
-    alert(`🎯 Winning number: ${result}`);
-  }, 4000);
-});
+    cycleCount++;
+    if (cycleCount >= cycles) {
+      clearInterval(animation);
+      ball.textContent = Math.floor(Math.random() * 10); // final number
+      ball.style.transform = 'scale(1)';
+      ball.classList.remove('glow');
+    }
+  }, interval);
+}
 </script>
+
 </body>
 </html>
