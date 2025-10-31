@@ -70,9 +70,6 @@
       #000 340.55deg 350.28deg,
       #0b0 350.28deg 360deg
     );
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .numbers {
@@ -82,16 +79,30 @@
     width: 100%;
     height: 100%;
     transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   .number {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform-origin: center calc(-50% + 6px);
-    font-size: calc(8px + 0.8vw);
+    transform-origin: center calc(-50% - 42%);
+    font-size: calc(10px + 0.8vw);
     color: white;
     text-shadow: 0 0 2px black;
+  }
+
+  .pointer {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid yellow;
+    z-index: 10;
   }
 
   .spin-button {
@@ -124,6 +135,7 @@
 </head>
 <body>
   <div class="roulette-container">
+    <div class="pointer"></div>
     <div class="wheel" id="wheel">
       <div class="numbers" id="numbers"></div>
     </div>
@@ -135,7 +147,7 @@ const wheel = document.getElementById('wheel');
 const spinBtn = document.getElementById('spin');
 const numbersContainer = document.getElementById('numbers');
 
-// European roulette layout
+// Single-zero European roulette numbers (37 slots)
 const numbers = [
   0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6,
   27, 13, 36, 11, 30, 8, 23, 10, 5, 24,
@@ -146,29 +158,36 @@ const numbers = [
 const totalNumbers = numbers.length;
 const sliceAngle = 360 / totalNumbers;
 
-// Place numbers evenly around the wheel
+// Place numbers evenly around edge
 numbers.forEach((num, i) => {
   const el = document.createElement('div');
   el.className = 'number';
   el.innerText = num;
   const angle = i * sliceAngle;
-  el.style.transform = `rotate(${angle}deg) translateY(-45%) rotate(-${angle}deg)`;
+  el.style.transform = `rotate(${angle}deg) translateY(-48%) rotate(-${angle}deg)`;
   numbersContainer.appendChild(el);
 });
 
 let currentRotation = 0;
+
 spinBtn.addEventListener('click', () => {
   spinBtn.disabled = true;
-  const randomNumber = Math.floor(Math.random() * totalNumbers);
-  const extraRotations = 5; // spin at least 5 times
-  const targetRotation = 360 * extraRotations + (360 - randomNumber * sliceAngle);
 
-  currentRotation += targetRotation;
+  const randomIndex = Math.floor(Math.random() * totalNumbers);
+  const extraRotations = 5;
+  const offsetToTop = sliceAngle / 2; // ensures number aligns with pointer at top
+  const targetAngle = (360 - randomIndex * sliceAngle - offsetToTop) % 360;
+
+  const totalRotation = 360 * extraRotations + targetAngle;
+  currentRotation += totalRotation;
+
   wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
   wheel.style.transform = `rotate(${currentRotation}deg)`;
 
   setTimeout(() => {
     spinBtn.disabled = false;
+    const result = numbers[randomIndex];
+    alert(`🎯 Winning number: ${result}`);
   }, 4000);
 });
 </script>
