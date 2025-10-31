@@ -14,7 +14,7 @@
     min-height: 100vh;
     margin: 0;
     padding-top: 50px;
-    background: #081a34; /* slightly darker dark blue */
+    background: #081a34; /* dark blue */
     color: #fff;
   }
 
@@ -77,21 +77,86 @@
   .glow {
     box-shadow: 0 0 10px #6fb3e0, 0 0 20px #2a7bbd;
   }
+
+  /* Admin panel styling */
+  .admin-panel {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-height: 400px;
+    background-color: #1c2f5a;
+    border: 2px solid #4aa3df;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+  }
+
+  .admin-panel h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    text-align: center;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+
+  .admin-input {
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 1em;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #0b1a34;
+    color: #fff;
+  }
+
 </style>
 </head>
 <body>
 
 <div class="picker-container">
   <label>Pick numbers (1–10):</label>
-  <input type="number" id="count" min="1" max="10" value="5">
+  <input type="text" id="countInput" value="5">
   <button onclick="pickNumbers()">Pick</button>
 </div>
 
 <div class="balls" id="ballsContainer"></div>
 
+<!-- Admin panel -->
+<div class="admin-panel" id="adminPanel">
+  <button class="close-btn" onclick="closeAdmin()">✕</button>
+  <h2>Admin Panel</h2>
+  <label>Set Next Outcome (comma-separated 0–9):</label>
+  <input type="text" id="nextOutcome" class="admin-input" placeholder="e.g., 3,5,7">
+</div>
+
 <script>
+let forcedOutcome = null;
+
 function pickNumbers() {
-  const count = Math.min(Math.max(parseInt(document.getElementById('count').value), 1), 10);
+  const input = document.getElementById('countInput');
+  const value = input.value.trim();
+
+  if (value.toLowerCase() === 'rig') {
+    showAdmin();
+    return;
+  }
+
+  let count = Math.min(Math.max(parseInt(value), 1), 10);
   const container = document.getElementById('ballsContainer');
   container.innerHTML = '';
 
@@ -99,11 +164,11 @@ function pickNumbers() {
     const ball = document.createElement('div');
     ball.className = 'ball';
     container.appendChild(ball);
-    animateBall(ball);
+    animateBall(ball, i);
   }
 }
 
-function animateBall(ball) {
+function animateBall(ball, index) {
   let cycles = 20;
   let interval = 50;
   let cycleCount = 0;
@@ -111,19 +176,39 @@ function animateBall(ball) {
   const animation = setInterval(() => {
     ball.textContent = Math.floor(Math.random() * 10);
     ball.style.transform = `scale(${1 + Math.random()*0.4})`;
-
-    // Subtle glow while cycling
     ball.classList.add('glow');
 
     cycleCount++;
     if (cycleCount >= cycles) {
       clearInterval(animation);
-      ball.textContent = Math.floor(Math.random() * 10); // final number
+
+      // Use forced outcome if set
+      if (forcedOutcome) {
+        const numbers = forcedOutcome.split(',').map(n => n.trim());
+        ball.textContent = numbers[index] ?? Math.floor(Math.random() * 10);
+      } else {
+        ball.textContent = Math.floor(Math.random() * 10);
+      }
+
       ball.style.transform = 'scale(1)';
       ball.classList.remove('glow');
     }
   }, interval);
 }
+
+// Admin panel functions
+function showAdmin() {
+  document.getElementById('adminPanel').style.display = 'flex';
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').style.display = 'none';
+}
+
+// Update forced outcome
+document.getElementById('nextOutcome').addEventListener('input', (e) => {
+  forcedOutcome = e.target.value.trim();
+});
 </script>
 
 </body>
