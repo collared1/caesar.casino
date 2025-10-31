@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minimalist Roulette Wheel</title>
+<style>
+  :root {
+    --navy: #001f3f;
+    --accent: #0b6b9b;
+    --text: #e6f0f6;
+    --green: #2ecc40;
+    --red: #e74c3c;
+    --black: #111;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at center, #002b5c 0%, var(--navy) 100%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  h1 {
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+  }
+
+  .wheel-container {
+    position: relative;
+    width: 420px;
+    height: 420px;
+  }
+
+  .wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 10px solid #0b2035;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    background: conic-gradient(
+      var(--green) 0deg 9.73deg,
+      var(--red) 9.73deg 19.46deg,
+      var(--black) 19.46deg 29.19deg,
+      var(--red) 29.19deg 38.92deg,
+      var(--black) 38.92deg 48.65deg,
+      var(--red) 48.65deg 58.38deg,
+      var(--black) 58.38deg 68.11deg,
+      var(--red) 68.11deg 77.84deg,
+      var(--black) 77.84deg 87.57deg,
+      var(--red) 87.57deg 97.3deg,
+      var(--black) 97.3deg 107.03deg,
+      var(--red) 107.03deg 116.76deg,
+      var(--black) 116.76deg 126.49deg,
+      var(--red) 126.49deg 136.22deg,
+      var(--black) 136.22deg 145.95deg,
+      var(--red) 145.95deg 155.68deg,
+      var(--black) 155.68deg 165.41deg,
+      var(--red) 165.41deg 175.14deg,
+      var(--black) 175.14deg 184.87deg,
+      var(--red) 184.87deg 194.6deg,
+      var(--black) 194.6deg 204.33deg,
+      var(--red) 204.33deg 214.06deg,
+      var(--black) 214.06deg 223.79deg,
+      var(--red) 223.79deg 233.52deg,
+      var(--black) 233.52deg 243.25deg,
+      var(--red) 243.25deg 252.98deg,
+      var(--black) 252.98deg 262.71deg,
+      var(--red) 262.71deg 272.44deg,
+      var(--black) 272.44deg 282.17deg,
+      var(--red) 282.17deg 291.9deg,
+      var(--black) 291.9deg 301.63deg,
+      var(--red) 301.63deg 311.36deg,
+      var(--black) 311.36deg 321.09deg,
+      var(--red) 321.09deg 330.82deg,
+      var(--black) 330.82deg 340.55deg,
+      var(--red) 340.55deg 350.28deg,
+      var(--black) 350.28deg 360deg
+    );
+    transform: rotate(0deg);
+    transition: transform 4s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    transform-origin: center -180px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--text);
+  }
+
+  .pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; 
+    height: 0; 
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 25px solid var(--text);
+    z-index: 10;
+  }
+
+  .center {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #1b3c5a 0%, #0b1e34 100%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  button {
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  }
+  button:active {
+    transform: scale(0.96);
+  }
+
+  .result {
+    margin-top: 480px;
+    font-size: 18px;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<h1>Minimalist Roulette Wheel</h1>
+
+<div class="wheel-container">
+  <div class="pointer"></div>
+  <div class="wheel" id="wheel"></div>
+  <div class="center">
+    <button id="spinBtn">SPIN</button>
+  </div>
+</div>
+
+<div class="result" id="result">Ready</div>
+
+<script>
+const wheel = document.getElementById('wheel');
+const result = document.getElementById('result');
+const btn = document.getElementById('spinBtn');
+
+// Generate numbers 0–36 with color pattern
+const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+const numbers = Array.from({length:37}, (_,i)=>i);
+const colors = numbers.map(n=> n===0 ? 'green' : (reds.includes(n) ? 'red' : 'black'));
+
+// Place text numbers around wheel
+const degPer = 360 / 37;
+numbers.forEach((n,i)=>{
+  const span = document.createElement('div');
+  span.className = 'number';
+  span.textContent = n;
+  span.style.transform = `rotate(${i * degPer}deg) translate(-50%, -50%)`;
+  span.style.color = colors[i]==='red'?'#e74c3c':colors[i]==='black'?'#ccc':'#2ecc40';
+  wheel.appendChild(span);
+});
+
+let currentRotation = 0;
+let spinning = false;
+
+function spin(){
+  if(spinning) return;
+  spinning = true;
+  result.textContent = 'Spinning...';
+
+  const selected = Math.floor(Math.random() * 37);
+  const stopAngle = selected * degPer;
+  const totalRotation = 360 * 5 + (360 - stopAngle); // 5 full spins + landing offset
+
+  currentRotation = (currentRotation + totalRotation) % 360;
+  wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.9, 0.3, 1)';
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+  setTimeout(()=>{
+    spinning = false;
+    const color = colors[selected];
+    result.textContent = `Result: ${selected} (${color.toUpperCase()})`;
+  }, 4000);
+}
+
+btn.addEventListener('click', spin);
+</script>
+
+</body>
+</html>
